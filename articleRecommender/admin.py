@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from articleRecommender.models import Interactions,Article,RecommendationConfiguration
+
+admin.site.register(Interactions)
+admin.site.register(Article)
+admin.site.register(RecommendationConfiguration)
