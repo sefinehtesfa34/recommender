@@ -1,10 +1,10 @@
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from articleRecommender.models import Article, Interactions#,RecommendationConfiguration
-from articleRecommender.serializers import ArticleSerializer, InteractionsSerializer #, RecommendConfigSerializer
+from articleRecommender.models import Article, Interactions
+from articleRecommender.serializers import ArticleSerializer, InteractionsSerializer 
 
 class ArticleView(APIView):
     def get_object(self,pk):
