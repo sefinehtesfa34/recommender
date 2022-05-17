@@ -1,3 +1,4 @@
+from random import choices
 from django.db import models
 
 class Article(models.Model):
@@ -6,19 +7,38 @@ class Article(models.Model):
     communtId=models.CharField(max_length=100)
     content=models.TextField()
     contentId=models.CharField(max_length=100)
-    source=models.CharField(max_length=100)
+    source=models.CharField(max_length=100,default='')
     timestamp=models.IntegerField() 
     title=models.CharField(max_length=100)
     
 class Interactions(models.Model):
-    userId=models.CharField(max_length=100,unique=True)
-    location=models.CharField(max_length=100)
-    eventType=models.IntegerField(unique=True)
-    articleId=models.ForeignKey(Article,on_delete=models.CASCADE)
-    communityId=models.CharField(max_length=100)
-    source=models.IntegerField()
-    timestamp=models.IntegerField()
+    CHOiCES=[
+        ("LIKE","LIKE"),
+        ("VIEW","VIEW"),
+        ("UNCOMMENT","UNCOMMENT"),
+        ("FOLLOW","FOLLOW"),
+        ("UNFOLLOW","UNFOLLOW"),
+        ("DISLIKE","DISLIKE"),
+        ("REACT-POSITIVE","REACT-POSITIVE"),
+        ("REACT-NEGATIVE","REACT-NEGATIVE"),
+        ("COMMENT-BEST-POSITIVE","COMMENT-BEST-POSITIVE"),
+        ("COMMENT-AVERAGE-POSITIVE","COMMENT-AVERAGE-POSITIVE"),
+        ("COMMENT-GOOD-POSITIVE","COMMENT-GOOD-POSITIVE"),
+        ("COMMENT-BEST-NEGATIVE","COMMENT-BEST-NEGATIVE"),
+        ("COMMENT-AVERAGE-NEGATIVE","COMMENT-AVERAGE-NEGATIVE"),
+        ("COMMENT-GOOD-NEGATIVE","COMMENT-GOOD-NEGATIVE")
+    ]
     
+    userId=models.CharField(max_length=100,default='')
+    location=models.CharField(max_length=100)
+    eventType=models.CharField(max_length=100,choices=CHOiCES ,default='')
+    contentId=models.ForeignKey(Article, db_column='contentId',on_delete=models.CASCADE)
+    communityId=models.CharField(max_length=100)
+    source=models.CharField(max_length=100,default='')
+    timestamp=models.IntegerField(default=0)
+    class Meta:
+        unique_together=["userId","contentId","eventType"]
+
 
 class RecommendationConfiguration(models.Model):
     communityId=models.UUIDField(max_length=100)
@@ -28,7 +48,7 @@ class RecommendationConfiguration(models.Model):
     popularity=models.FloatField()
     random=models.FloatField() 
     timelines=models.FloatField()
-    
+
     
     
     

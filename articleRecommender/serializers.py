@@ -10,9 +10,20 @@ class InteractionsSerializer(serializers.ModelSerializer):
     class Meta:
         model=Interactions
         fields='__all__'
+class ArticleIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Interactions
+        fields=['contentId']
 
-# class RecommendConfigSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model=RecommendationConfiguration
-#         fields='__all__'
+class ContentIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Article
+        fields=['contentId']
+        
+
+
+
+
+
+
 
