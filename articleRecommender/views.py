@@ -2,12 +2,11 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from yaml import serialize
 from articleRecommender.evaluatorModel import ModelEvaluator
 
 from articleRecommender.models import Article, Interactions
 from articleRecommender.preProcessorModel import PreprocessingModel
-from .serializers import ArticleIdSerializer, ArticleSerializer, ContentIdSerializer, InteractionsSerializer 
+from .serializers import  ArticleSerializer, InteractionsSerializer 
 
 
 class ArticleView(APIView):
