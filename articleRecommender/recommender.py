@@ -1,8 +1,4 @@
 # #Computes the most popular items
-# item_popularity_df = interactions_full_df.groupby('contentId')['eventStrength']\
-#                                     .sum()\
-#                                     .sort_values(ascending=False)\
-#                                     .reset_index()
 
 class PopularityRecommender:
     
@@ -38,6 +34,6 @@ class PopularityRecommender:
                                     left_on = 'contentId', 
                                     right_on = 'contentId')[['eventStrength', 'contentId', 'title', 'url', 'lang']]
 
-        
+
         return recommendations_df
     

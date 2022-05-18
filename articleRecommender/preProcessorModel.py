@@ -1,21 +1,6 @@
-import sklearn
 import pandas as pd
-import numpy as np
-import random
-import scipy
-import nltk
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.feature_extraction.text import TfidfVectorizer,CountVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.metrics import mean_squared_error
-from scipy.sparse.linalg import svds
-from scipy.sparse import csr_matrix
-from nltk.corpus import stopwords
 import math 
-import random
 
 from articleRecommender.recommender import PopularityRecommender
 class PreprocessingModel:
