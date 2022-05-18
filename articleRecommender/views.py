@@ -94,6 +94,7 @@ class RecommenderView(APIView):
         
         self.interactions=Interactions.objects.filter()
         self.article=Article.objects.filter()
+        
         self.user_interacted=None
         self.interactions_serializer=InteractionsSerializer(self.interactions,many=True)
         self.article_serializer=ArticleSerializer(self.article,many=True) 
@@ -120,27 +121,30 @@ class RecommenderView(APIView):
             return Interactions.objects.filter(userId=userId)
             
         except Interactions.DoesNotExist:
-            return Http404
+            return None 
     
     def get(self,request,userId,format=None):
         
+        user_interact_contentId=self.get_object(userId)
+        try:
+            assert(user_interact_contentId)
+        except AssertionError:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+            
+        self.preprocessingModel.getUserId(userId)
+        self.recommended_items=self.preprocessingModel.recommended
         train,test=self.preprocessingModel.trainTestSpliter()
         full_set=self.preprocessingModel.interactions_full_indexed_df
         articles_df=self.preprocessingModel.article_df
         
-        modelEvaluator=ModelEvaluator(train,test,full_set,articles_df)
-        
-        modelEvaluator.get_items_interacted(userId)
-        
-        user_interact_contentId=self.get_object(userId)
+        self.modelEvaluator=ModelEvaluator(train,test,full_set,articles_df)
+    
         serializer=InteractionsSerializer(user_interact_contentId,many=True)
-        
         self.user_interacted=serializer.data
         
-        if user_interact_contentId is not Http404:
-            return Response(serializer.data)
+        return Response(self.recommended_items)
         
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        
         
         
         
