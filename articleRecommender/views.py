@@ -2,8 +2,9 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import pagination
 from articleRecommender.evaluatorModel import ModelEvaluator
-
+from rest_framework.generics import ListCreateAPIView
 from articleRecommender.models import Article, Interactions
 from articleRecommender.preProcessorModel import PreprocessingModel
 from .serializers import  ArticleSerializer, InteractionsSerializer 
@@ -136,14 +137,19 @@ class RecommenderView(APIView):
         train,test=self.preprocessingModel.trainTestSpliter()
         full_set=self.preprocessingModel.interactions_full_indexed_df
         articles_df=self.preprocessingModel.article_df
-        
         self.modelEvaluator=ModelEvaluator(train,test,full_set,articles_df)
     
         serializer=InteractionsSerializer(user_interact_contentId,many=True)
         self.user_interacted=serializer.data
         
         return Response(self.recommended_items)
-        
+class RecommendedListView(ListCreateAPIView):
+    
+    queryset=Article.objects.all()
+    serializer_class=ArticleSerializer
+    pagination_class=pagination.PageNumberPagination
+    
+            
         
         
         
