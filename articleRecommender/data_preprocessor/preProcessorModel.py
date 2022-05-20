@@ -16,7 +16,6 @@ class PreprocessingModel:
         
         
         self.printer()
-        # self.trainTestSpliter()
     def getUserId(self,userId):
         self.recommended=self.popularity_model.recommend_items(userId)
     def printer(self):
@@ -34,7 +33,6 @@ class PreprocessingModel:
                                  
                                    test_size=0.20,
                                    random_state=42,
-                                   #    stratify=self.interactions_df['userId']
                                 )
         
         self.interactions_full_indexed_df = self.interactions_df.set_index('userId')

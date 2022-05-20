@@ -1,5 +1,3 @@
-# #Computes the most popular items
-
 class PopularityRecommender:
     
     MODEL_NAME = 'Popularity'
@@ -19,7 +17,6 @@ class PopularityRecommender:
         return self.MODEL_NAME
         
     def recommend_items(self, user_id, items_to_ignore=[], topn=10, verbose=False):
-        # Recommend the more popular items that the user hasn't seen yet.
         recommendations_df = self.popularity_df[~self.popularity_df['contentId'].isin(items_to_ignore)] \
                                .sort_values('eventStrength', ascending = False) \
                                .head(topn)['contentId']
