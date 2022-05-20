@@ -110,8 +110,8 @@ class InteractionsView(APIView):
 class PopularityRecommenderView(APIView,PageNumberPagination):
     def __init__(self):
         
-        self.interactions=Interactions.objects.filter()
-        self.article=Article.objects.filter()
+        self.interactions=Interactions.objects.all()
+        self.article=Article.objects.all()
         
         self.user_interacted=None
         self.interactions_serializer=InteractionsSerializer(self.interactions,many=True)
@@ -165,6 +165,32 @@ class PopularityRecommenderView(APIView,PageNumberPagination):
         
         
         return self.get_paginated_response(serializer.data)
+class ContentBasedRecommenderView(APIView):
+    def __init__(self):
+        
+        self.interactions=Interactions.objects.all()
+        self.article=Article.objects.all()
+        
+        self.user_interacted=None
+        self.interactions_serializer=InteractionsSerializer(self.interactions,many=True)
+        self.article_serializer=ArticleSerializer(self.article,many=True) 
+        self.eventStrength={
+            "LIKE":1.0,
+            "VIEW":5.0,
+            "FOLLOW":2.0,
+            "UNFOLLOW":2.0,
+            "DISLIKE":1.0,
+            "REACT-POSITIVE":1.5,
+            "REACT-NEGATIVE":1.5,
+            "COMMENT-BEST-POSITIVE":3.0,
+            "COMMENT-AVERAGE-POSITIVE":2.5,
+            "COMMENT-GOOD-POSITIVE":2.0,
+            "COMMENT-BEST-NEGATIVE":3.0,
+            "COMMENT-AVERAGE-NEGATIVE":2.5,
+            "COMMENT-GOOD-NEGATIVE":2.0,    
+            }
+        self.preprocessingModel=PreprocessingModel(self.interactions_serializer.data,self.article_serializer.data,self.eventStrength)
+        
                     
         
         
