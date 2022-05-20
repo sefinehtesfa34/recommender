@@ -107,7 +107,7 @@ class InteractionsView(APIView):
         article.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
  
-class RecommenderView(APIView,PageNumberPagination):
+class PopularityRecommenderView(APIView,PageNumberPagination):
     def __init__(self):
         
         self.interactions=Interactions.objects.filter()

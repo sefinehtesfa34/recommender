@@ -15,12 +15,8 @@ class PreprocessingModel:
         self.recommended=None
         
         
-        self.printer()
     def getUserId(self,userId):
         self.recommended=self.popularity_model.recommend_items(userId)
-    def printer(self):
-        print(self.interactions_df )
-        
     def preporcessor(self):
         self.interactions_df['eventStrength'] = self.interactions_df['eventType'].apply(lambda x: self.eventStrength[x])
         def smooth_user_preference(x):

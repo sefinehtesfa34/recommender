@@ -69,7 +69,7 @@ class ModelEvaluator:
         people_metrics = []
         for idx, person_id in enumerate(list(self.test_set_df.index.unique().values)):
             person_metrics = self.evaluate_model_for_user(model, person_id)  
-            person_metrics['_person_id'] = person_id
+            person_metrics['_persoPopularityRecommenderViewn_id'] = person_id
             people_metrics.append(person_metrics)
         detailed_results_df = pd.DataFrame(people_metrics) \
                             .sort_values('interacted_count', ascending=False)
