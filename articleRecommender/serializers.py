@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import Article,Interactions#RecommendationConfiguration
+from .models import Article,Interactions
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model=Article
