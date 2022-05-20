@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import math 
 
-from articleRecommender.recommender import PopularityRecommender
+from articleRecommender.popularity_recommender.recommender import PopularityRecommender
 class PreprocessingModel:
     def __init__(self,interactions_json,article_json,eventStrength):
         self.interaction_json=interactions_json

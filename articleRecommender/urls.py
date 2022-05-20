@@ -8,5 +8,4 @@ urlpatterns = [
     path('interact/',views.InteractionsView.as_view()),
     path('interact/<int:pk>/',views.InteractionsView.as_view()),
     path('recommend/<int:userId>/',views.RecommenderView.as_view()),
-    path('pagination/',views.RecommendedListView.as_view()),
     ]

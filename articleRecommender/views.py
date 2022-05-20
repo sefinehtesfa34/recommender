@@ -1,12 +1,13 @@
+from rest_framework.pagination import PageNumberPagination
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import pagination
-from articleRecommender.evaluatorModel import ModelEvaluator
+from articleRecommender.model_evaluator.evaluatorModel import ModelEvaluator
 from rest_framework.generics import ListCreateAPIView
 from articleRecommender.models import Article, Interactions
-from articleRecommender.preProcessorModel import PreprocessingModel
+from articleRecommender.data_preprocessor.preProcessorModel import PreprocessingModel
 from .serializers import  ArticleSerializer, InteractionsSerializer 
 
 
@@ -90,7 +91,7 @@ class InteractionsView(APIView):
         article.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
  
-class RecommenderView(APIView):
+class RecommenderView(APIView,PageNumberPagination):
     def __init__(self):
         
         self.interactions=Interactions.objects.filter()
@@ -138,19 +139,17 @@ class RecommenderView(APIView):
         full_set=self.preprocessingModel.interactions_full_indexed_df
         articles_df=self.preprocessingModel.article_df
         self.modelEvaluator=ModelEvaluator(train,test,full_set,articles_df)
-    
         serializer=InteractionsSerializer(user_interact_contentId,many=True)
         self.user_interacted=serializer.data
         
-        return Response(self.recommended_items)
-class RecommendedListView(ListCreateAPIView):
-    
-    queryset=Article.objects.all()
-    serializer_class=ArticleSerializer
-    pagination_class=pagination.PageNumberPagination
-    
-            
+        recommended_articles=Article.objects.filter(pk__in=list(self.recommended_items))
         
+        result=self.paginate_queryset(recommended_articles,request,view=self)
+        serializer=ArticleSerializer(result,many=True)    
+        
+        
+        return self.get_paginated_response(serializer.data)
+                    
         
         
         
