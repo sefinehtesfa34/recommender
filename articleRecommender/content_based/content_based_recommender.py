@@ -1,42 +1,62 @@
-import matplotlib.pyplot as plt 
-import seaborn as sns
-from sklearn.cluster import KMeans
-import gensim 
-from gensim.models.doc2vec import Doc2Vec,TaggedDocument
 import sklearn
-import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import math
-import random
 import scipy
-import nltk
-import time
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.feature_extraction.text import TfidfVectorizer,CountVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.metrics import mean_squared_error
-from scipy.sparse.linalg import svds
-from scipy.sparse import csr_matrix
-from nltk.corpus import stopwords
+from articleRecommender.content_based.content_based_model.contentBasedRecommnder import ContentBasedRecommender
+from articleRecommender.content_based.word_vetorizer.tfidf_vectorizer import TfidfVectorizerModel
+from sklearn.model_selection import train_test_split
+class ContentBasedRecommenderModel:
+    def __init__(self,articles_df,interactions_df):
+        
+        self.interactions_train_df,self.interactions_test_df = train_test_split(interactions_df,\
+                                                                                    test_size=0.20,\
+                                                                                random_state=42)
+        self.articles_df=articles_df
+        self.vectorizerModel=TfidfVectorizerModel(articles_df)
+        self.build_users_profiles()        
+        self.contentBasedRecommender=ContentBasedRecommender(self.user_profiles,articles_df,articles_df["contentId"].tolist())
+    def recommend_with_userId(self,userId):
+        
+        return self.contentBasedRecommender.recommend_items(userId)
+           
+    def get_item_profile(self,item_id):
+        # idx = self.vectorizerModel.item_ids.index(item_id)
+        item_profile =self.vectorizerModel.tfidf_matrix[item_id:item_id+1]
+        # print(np.asarray(item_profile))
+        return np.asarray(item_profile)
 
 
-# nltk.download('stopwords')
-#Ignoring stopwords (words with no semantics) from English and Portuguese (as we have a corpus with mixed languages)
-stopwords_list = stopwords.words('english') + stopwords.words('portuguese')
+    def get_item_profiles(self,ids):
+        item_profiles_list = [self.get_item_profile(x) for x in ids]
+        print("The problem is inside the get_item_profiles function in ")
+        for item in item_profiles_list:
+            print(item.shape)
+        item_profiles = scipy.sparse.vstack(item_profiles_list).toarry()
+        #Here above is the problem
+        
+        return item_profiles
 
-#Trains a model whose vectors size is 5000, composed by the main unigrams and bigrams found in the corpus, ignoring stopwords
-vectorizer = CountVectorizer(analyzer='word',
-                     ngram_range=(1, 2),
-                     min_df=0.003,
-                     max_df=0.5,
-                     max_features=5000,
-                     stop_words=stopwords_list)
+    def build_users_profile(self,userId, interactions_indexed_df):
+        interactions_person_df = interactions_indexed_df.loc[userId]
+        
+        user_item_profiles = self.get_item_profiles(interactions_person_df['contentId'])
+        user_item_strengths = np.array(interactions_person_df['eventStrength']).reshape(-1,1)
+        #Weighted average of item profiles by the interactions strength
+        # print(user_item_profiles)
+        # print(user_item_strengths)
+        user_item_strengths_weighted_avg = np.sum(user_item_profiles.multiply(user_item_strengths), axis=0) / np.sum(user_item_strengths)
+        user_profile_norm = sklearn.preprocessing.normalize(user_item_strengths_weighted_avg)
+        print()
+        print("The norms of the matrix")
+        print()
+        print(user_profile_norm[0])
+        
+        return user_profile_norm
 
-# item_ids = articles_df['contentId'].tolist()
-# tfidf_matrix = vectorizer.fit_transform(articles_df['title'] + "" + articles_df['text'])
-# tfidf_feature_names = vectorizer.get_feature_names()
-# tfidf_matrix
+    def build_users_profiles(self): 
+        
+        interactions_indexed_df = self.interactions_train_df.set_index('userId')
+        self.user_profiles = {}
+        for userId in interactions_indexed_df.index.unique():
+            self.user_profiles[userId] = self.build_users_profile(userId, interactions_indexed_df)
+        

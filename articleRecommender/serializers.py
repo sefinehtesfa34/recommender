@@ -10,7 +10,11 @@ class InteractionsSerializer(serializers.ModelSerializer):
     class Meta:
         model=Interactions
         fields='__all__'
-
+class ContentIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Interactions
+        fields=['contentId']
+        
 
 
 
