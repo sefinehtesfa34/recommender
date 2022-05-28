@@ -65,3 +65,20 @@ print(df.head())
 #     ...:         )
 #     ...: 
 #     ...: 
+# id
+# authorId
+# authorResidence
+# communtId
+# content
+# contentId
+# source
+# timestamp
+# title
+# {"userId"
+# "location"
+# "eventType" 
+# "contentId" 
+# "communityId"
+# "source" 
+# "timestamp"
+# } 

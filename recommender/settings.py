@@ -10,8 +10,9 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
 from pathlib import Path
+from tkinter.messagebox import NO
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,15 +20,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
-SECRET_KEY = 'django-insecure-rhwqbb6(7(%zxppm^4mp!_69*aaw@#w^e5q4zl@jwhfn9*flbe'
+SECRET_KEY = os.environ.get("SECRET_KEY")
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(int(os.environ.get("DEBUG",0)))
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS.extend(
+    filter(None,os.environ.get("ALLOWED_HOSTS",'').split(',')),
+)
 
 # Application definition
 
@@ -78,11 +82,23 @@ WSGI_APPLICATION = 'recommender.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'sefineh',
+        'USER':'sefineh',
+        'HOST':'db',
+        'PORT':"8000"
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'zuri',
+#         'USER': 'zuri',
+#         'HOST': 'db',
+#         'PORT': 5432,
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

@@ -12,51 +12,39 @@ class ContentBasedRecommenderModel:
                                                                                     test_size=0.20,\
                                                                                 random_state=42)
         self.articles_df=articles_df
+        self.item_ids=self.articles_df["contentId"].tolist()
         self.vectorizerModel=TfidfVectorizerModel(articles_df)
-        self.build_users_profiles()        
-        self.contentBasedRecommender=ContentBasedRecommender(self.user_profiles,articles_df,articles_df["contentId"].tolist())
-    def recommend_with_userId(self,userId):
+        self.user_profiles=self.build_users_profiles()        
+        self.contentBasedRecommender=ContentBasedRecommender(self.user_profiles,\
+                                                            articles_df,\
+                                                            self.item_ids)
         
+    def items_recommender(self,userId):
         return self.contentBasedRecommender.recommend_items(userId)
-           
     def get_item_profile(self,item_id):
-        # idx = self.vectorizerModel.item_ids.index(item_id)
-        item_profile =self.vectorizerModel.tfidf_matrix[item_id:item_id+1]
-        # print(np.asarray(item_profile))
-        return np.asarray(item_profile)
-
+        idx = self.item_ids.index(item_id)
+        item_profile = self.vectorizerModel.tfidf_matrix[idx:idx+1]
+        return item_profile
 
     def get_item_profiles(self,ids):
         item_profiles_list = [self.get_item_profile(x) for x in ids]
-        print("The problem is inside the get_item_profiles function in ")
-        for item in item_profiles_list:
-            print(item.shape)
-        item_profiles = scipy.sparse.vstack(item_profiles_list).toarry()
-        #Here above is the problem
-        
+        item_profiles = scipy.sparse.vstack(item_profiles_list)
         return item_profiles
 
-    def build_users_profile(self,userId, interactions_indexed_df):
-        interactions_person_df = interactions_indexed_df.loc[userId]
-        
+    def build_users_profile(self,person_id, interactions_indexed_df):
+        interactions_person_df = interactions_indexed_df.loc[person_id]
         user_item_profiles = self.get_item_profiles(interactions_person_df['contentId'])
+        
         user_item_strengths = np.array(interactions_person_df['eventStrength']).reshape(-1,1)
-        #Weighted average of item profiles by the interactions strength
-        # print(user_item_profiles)
-        # print(user_item_strengths)
         user_item_strengths_weighted_avg = np.sum(user_item_profiles.multiply(user_item_strengths), axis=0) / np.sum(user_item_strengths)
         user_profile_norm = sklearn.preprocessing.normalize(user_item_strengths_weighted_avg)
-        print()
-        print("The norms of the matrix")
-        print()
-        print(user_profile_norm[0])
-        
         return user_profile_norm
 
     def build_users_profiles(self): 
-        
-        interactions_indexed_df = self.interactions_train_df.set_index('userId')
-        self.user_profiles = {}
-        for userId in interactions_indexed_df.index.unique():
-            self.user_profiles[userId] = self.build_users_profile(userId, interactions_indexed_df)
-        
+        interactions_indexed_df = self.interactions_train_df[self.interactions_train_df['contentId'] \
+                                                    .isin(self.articles_df['contentId'])].set_index('userId')
+        user_profiles = {}
+        for person_id in interactions_indexed_df.index.unique():
+            user_profiles[person_id] = self.build_users_profile(person_id, interactions_indexed_df)
+        return user_profiles
+    

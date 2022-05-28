@@ -26,7 +26,8 @@ class PreprocessingModel:
             recommended_items=self.popularity_model.recommend_items(userId)
             
         if self.flag=="content-based":
-            recommended_items=self.contentBasedRecommenderModel.recommend_with_userId(userId)
+            recommended_items=self.contentBasedRecommenderModel.items_recommender(userId)
+            
         return recommended_items 
     def preporcessor(self):
         self.interactions_df['eventStrength'] = self.interactions_df['eventType'].apply(lambda x: self.eventStrength.get(x,0))

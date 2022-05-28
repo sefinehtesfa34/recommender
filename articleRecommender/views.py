@@ -183,7 +183,6 @@ class PopularityRecommenderView(APIView,PageNumberPagination):
 
 class ContentBasedRecommenderView(APIView):
     def __init__(self):
-        
         self.interactions=Interactions.objects.all()
         self.article=Article.objects.all()
         self.user_interacted=None
@@ -217,8 +216,8 @@ class ContentBasedRecommenderView(APIView):
             return None 
     
     def get(self,request,userId,format=None):
-        
         user_interact_contentId=self.get_object(userId)
+        
         try:
             assert(user_interact_contentId)
         except AssertionError:
